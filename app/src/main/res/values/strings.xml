@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">EasyReader</string>
+
+    <string name="nav_1">One</string>
+    <string name="nav_2">Two</string>
+    <string name="nav_3">Three</string>
+    <string name="nav_4">Fore</string>
+</resources>

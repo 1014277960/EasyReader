@@ -1,0 +1,6 @@
+rootProject.name = "EasyReader"
+include ':app'
+include ':network'
+include ':bookserver'
+include ':appcontext'
+include ':readerview'
