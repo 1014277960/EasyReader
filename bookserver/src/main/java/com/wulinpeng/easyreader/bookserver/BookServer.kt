@@ -18,7 +18,8 @@ object BookServer {
     fun init(application: Application) {
         BookSourceManager
             .addBookSource(BiqugeSource())
-            .addBookSource(BiqugeBizSource())
+        // TODO: search error
+//            .addBookSource(BiqugeBizSource())
     }
 
     suspend fun searchBook(bookName: String): List<Book> {

@@ -1,19 +1,29 @@
 package com.wulinpeng.easyreader.detail
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults.buttonColors
 import androidx.compose.material.Divider
+import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberImagePainter
 import com.wulinpeng.easyreader.bookserver.model.Book
+import com.wulinpeng.easyreader.bookserver.model.Chapter
 import com.wulinpeng.easyreader.detail.viewmodel.BookDetailViewModel
 
 /**
@@ -28,6 +38,11 @@ fun BookDetailView(vm: BookDetailViewModel) {
         if (book != null) {
             Header(book!!)
             Desc(book!!)
+            ChapterList(
+                Modifier
+                    .weight(1f)
+                    .fillMaxWidth(), book!!)
+            BottomView()
         } else {
             Loading()
         }
@@ -88,6 +103,45 @@ private fun Desc(book: Book) {
 }
 
 @Composable
+fun ChapterList(modifier: Modifier, book: Book) {
+    val chapters = book.chapterList!!
+    LazyColumn(modifier = modifier) {
+        items(chapters) { chapter ->
+            ChapterView(chapter)
+        }
+    }
+}
+
+@Composable
+fun ChapterView(chapter: Chapter) {
+    Text(text = chapter.title, modifier = Modifier.padding(10.dp))
+}
+
+@Composable
+fun BottomView() {
+    Row(modifier = Modifier
+        .fillMaxWidth()
+        .wrapContentHeight().background(Color.Transparent).padding(0.dp, 0.dp, 0.dp, 12.dp)) {
+        Button(colors = buttonColors(backgroundColor = Color.White),
+            modifier = Modifier
+            .weight(1f)
+            .wrapContentHeight().padding(10.dp, 0.dp, 5.dp, 0.dp), onClick = { /*TODO*/ }) {
+            Text(text = "加入书架", textAlign = TextAlign.Center, fontSize = 20.sp, color = Color.Black)
+        }
+
+        Button(colors = buttonColors(backgroundColor = Color.Red),
+            shape = RoundedCornerShape(20.dp),
+            modifier = Modifier
+            .weight(1f)
+            .wrapContentHeight().padding(5.dp, 0.dp, 10.dp, 0.dp), onClick = { /*TODO*/ }) {
+            Text(text = "立即阅读", textAlign = TextAlign.Center, fontSize = 20.sp, color = Color.White)
+        }
+    }
+}
+
+@Composable
 fun Loading() {
-    Text(text = "书籍信息加载中", modifier = Modifier.fillMaxWidth().fillMaxHeight(), textAlign = TextAlign.Center, fontSize = 20.sp)
+    Text(text = "书籍信息加载中", modifier = Modifier
+        .fillMaxWidth()
+        .fillMaxHeight(), textAlign = TextAlign.Center, fontSize = 20.sp)
 }
