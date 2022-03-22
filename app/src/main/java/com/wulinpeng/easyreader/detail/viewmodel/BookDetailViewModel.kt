@@ -17,5 +17,6 @@ import kotlinx.coroutines.flow.SharedFlow
 class BookDetailViewModel: ViewModel() {
 
     val book = mutableStateOf<Book?>(null)
-
+    val chapterClickFlow = MutableSharedFlow<Int>(extraBufferCapacity = Int.MAX_VALUE)
+    val startReadFlow = MutableSharedFlow<Unit>(extraBufferCapacity = Int.MAX_VALUE)
 }

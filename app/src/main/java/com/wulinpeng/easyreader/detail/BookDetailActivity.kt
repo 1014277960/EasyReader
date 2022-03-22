@@ -9,8 +9,10 @@ import androidx.lifecycle.ViewModelProvider
 import com.wulinpeng.easyreader.bookserver.model.Book
 import com.wulinpeng.easyreader.bookserver.model.getBookDetail
 import com.wulinpeng.easyreader.detail.viewmodel.BookDetailViewModel
+import com.wulinpeng.easyreader.readerview.ReaderActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 
@@ -46,6 +48,17 @@ class BookDetailActivity : AppCompatActivity(), CoroutineScope {
 
         launch {
             vm.book.value = book.getBookDetail()
+        }
+
+        launch {
+            vm.chapterClickFlow.collect {
+                ReaderActivity.start(this@BookDetailActivity, vm.book.value!!, it)
+            }
+        }
+        launch {
+            vm.startReadFlow.collect {
+                ReaderActivity.start(this@BookDetailActivity, vm.book.value!!)
+            }
         }
 
     }

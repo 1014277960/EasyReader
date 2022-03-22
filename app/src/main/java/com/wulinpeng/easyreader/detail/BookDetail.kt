@@ -12,6 +12,7 @@ import androidx.compose.material.Divider
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -25,6 +26,7 @@ import coil.compose.rememberImagePainter
 import com.wulinpeng.easyreader.bookserver.model.Book
 import com.wulinpeng.easyreader.bookserver.model.Chapter
 import com.wulinpeng.easyreader.detail.viewmodel.BookDetailViewModel
+import kotlinx.coroutines.launch
 
 /**
  * author：wulinpeng
@@ -41,8 +43,8 @@ fun BookDetailView(vm: BookDetailViewModel) {
             ChapterList(
                 Modifier
                     .weight(1f)
-                    .fillMaxWidth(), book!!)
-            BottomView()
+                    .fillMaxWidth(), book!!, vm)
+            BottomView(vm)
         } else {
             Loading()
         }
@@ -103,37 +105,53 @@ private fun Desc(book: Book) {
 }
 
 @Composable
-fun ChapterList(modifier: Modifier, book: Book) {
+fun ChapterList(modifier: Modifier, book: Book, vm: BookDetailViewModel) {
+    val coroutineScope = rememberCoroutineScope()
     val chapters = book.chapterList!!
     LazyColumn(modifier = modifier) {
         items(chapters) { chapter ->
-            ChapterView(chapter)
+            ChapterView(chapter) {
+                coroutineScope.launch {
+                    vm.chapterClickFlow.emit(chapters.indexOf(chapter))
+                }
+            }
         }
     }
 }
 
 @Composable
-fun ChapterView(chapter: Chapter) {
-    Text(text = chapter.title, modifier = Modifier.padding(10.dp))
+fun ChapterView(chapter: Chapter, onClick: () -> Unit) {
+    Button(colors = buttonColors(backgroundColor = Color.White), onClick = { onClick() }) {
+        Text(text = chapter.title, modifier = Modifier.fillMaxWidth())
+    }
 }
 
 @Composable
-fun BottomView() {
+fun BottomView(vm: BookDetailViewModel) {
+    val coroutineScope = rememberCoroutineScope()
     Row(modifier = Modifier
         .fillMaxWidth()
-        .wrapContentHeight().background(Color.Transparent).padding(0.dp, 0.dp, 0.dp, 12.dp)) {
+        .wrapContentHeight()
+        .background(Color.Transparent)
+        .padding(0.dp, 0.dp, 0.dp, 12.dp)) {
         Button(colors = buttonColors(backgroundColor = Color.White),
             modifier = Modifier
-            .weight(1f)
-            .wrapContentHeight().padding(10.dp, 0.dp, 5.dp, 0.dp), onClick = { /*TODO*/ }) {
+                .weight(1f)
+                .wrapContentHeight()
+                .padding(10.dp, 0.dp, 5.dp, 0.dp), onClick = { /*TODO*/ }) {
             Text(text = "加入书架", textAlign = TextAlign.Center, fontSize = 20.sp, color = Color.Black)
         }
 
         Button(colors = buttonColors(backgroundColor = Color.Red),
             shape = RoundedCornerShape(20.dp),
             modifier = Modifier
-            .weight(1f)
-            .wrapContentHeight().padding(5.dp, 0.dp, 10.dp, 0.dp), onClick = { /*TODO*/ }) {
+                .weight(1f)
+                .wrapContentHeight()
+                .padding(5.dp, 0.dp, 10.dp, 0.dp), onClick = {
+                    coroutineScope.launch {
+                        vm.startReadFlow.emit(Unit)
+                    }
+                }) {
             Text(text = "立即阅读", textAlign = TextAlign.Center, fontSize = 20.sp, color = Color.White)
         }
     }
