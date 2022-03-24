@@ -6,9 +6,13 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.wulinpeng.easyreader.bookserver.model.Book
+import com.wulinpeng.easyreader.bookserver.model.fillChapterContent
+import com.wulinpeng.easyreader.readerview.manager.ChapterRenderManager
 import com.wulinpeng.easyreader.readerview.ui.ReaderRootView
 import com.wulinpeng.easyreader.readerview.viewmodel.ReaderViewModel
+import kotlinx.coroutines.launch
 
 class ReaderActivity : AppCompatActivity() {
 
@@ -29,6 +33,8 @@ class ReaderActivity : AppCompatActivity() {
         ViewModelProvider(this).get(ReaderViewModel::class.java)
     }
 
+    private val renderManager = ChapterRenderManager()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val book = intent.getSerializableExtra(KEY_BOOK) as? Book
@@ -40,7 +46,8 @@ class ReaderActivity : AppCompatActivity() {
         readerViewModel.book = book
         readerViewModel.startChapter = startChapter
         setContent {
-            ReaderRootView(readerViewModel)
+            ReaderRootView(readerViewModel, renderManager)
         }
+        readerViewModel.loadCurrentChapter()
     }
 }
