@@ -10,15 +10,17 @@ import com.wulinpeng.easyreader.bookserver.model.Book
 import com.wulinpeng.easyreader.bookserver.model.getBookDetail
 import com.wulinpeng.easyreader.detail.viewmodel.BookDetailViewModel
 import com.wulinpeng.easyreader.readerview.ReaderActivity
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 
 class BookDetailActivity : AppCompatActivity(), CoroutineScope {
     override val coroutineContext: CoroutineContext
-        get() = Dispatchers.Main.immediate
+        get() = Dispatchers.Main.immediate + ErrorHandler()
 
     companion object {
 
@@ -48,6 +50,7 @@ class BookDetailActivity : AppCompatActivity(), CoroutineScope {
 
         launch {
             vm.book.value = book.getBookDetail()
+            vm.errorMsg.value = null
         }
 
         launch {
@@ -60,6 +63,24 @@ class BookDetailActivity : AppCompatActivity(), CoroutineScope {
                 ReaderActivity.start(this@BookDetailActivity, vm.book.value!!)
             }
         }
+        launch(Dispatchers.Main) {
+            vm.refreshFlow.collect {
+                try {
+                    vm.book.value = book.getBookDetail()
+                } catch (t: Throwable) {
+                    vm.errorMsg.value = t.message
+                }
+            }
+        }
 
+    }
+
+    inner class ErrorHandler: CoroutineExceptionHandler {
+        override val key = CoroutineExceptionHandler
+
+        override fun handleException(context: CoroutineContext, exception: Throwable) {
+            exception.printStackTrace()
+            vm.errorMsg.value = exception.message
+        }
     }
 }

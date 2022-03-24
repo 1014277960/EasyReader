@@ -26,7 +26,14 @@ import kotlinx.coroutines.InternalCoroutinesApi
  */
 @Composable
 fun ReaderRootView(vm: ReaderViewModel, renderManager: ChapterRenderManager) {
-    if (vm.currentChapter == null) {
+    if(vm.errorMsg != null) {
+        Column {
+            Button(onClick = { vm.loadCurrentChapter() }) {
+                Text(text = "重试")
+            }
+            Text(text = vm.errorMsg!!)
+        }
+    } else if  (vm.currentChapter == null) {
         Text(text = "Loading")
     } else {
         // TODO: 多线程？？

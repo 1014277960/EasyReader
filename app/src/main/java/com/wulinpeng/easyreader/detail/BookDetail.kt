@@ -45,6 +45,11 @@ fun BookDetailView(vm: BookDetailViewModel) {
                     .weight(1f)
                     .fillMaxWidth(), book!!, vm)
             BottomView(vm)
+        } else if (vm.errorMsg.value != null) {
+            Button(onClick = { vm.refresh() }) {
+                Text(text = "重试")
+            }
+            Text(text = vm.errorMsg.value!!)
         } else {
             Loading()
         }

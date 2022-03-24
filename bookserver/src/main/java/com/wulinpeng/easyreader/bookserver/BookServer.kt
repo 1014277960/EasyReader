@@ -6,6 +6,7 @@ import com.wulinpeng.easyreader.bookserver.model.Chapter
 import com.wulinpeng.easyreader.bookserver.source.BiqugeBizSource
 import com.wulinpeng.easyreader.bookserver.source.BiqugeSource
 import com.wulinpeng.easyreader.bookserver.source.BookSourceManager
+import com.wulinpeng.easyreader.bookserver.source.YueReaderSource
 import kotlinx.coroutines.awaitAll
 
 /**
@@ -17,6 +18,7 @@ object BookServer {
 
     fun init(application: Application) {
         BookSourceManager
+//            .addBookSource(YueReaderSource())
             .addBookSource(BiqugeSource())
         // TODO: search error
 //            .addBookSource(BiqugeBizSource())

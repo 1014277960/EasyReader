@@ -8,7 +8,10 @@ import java.io.Serializable
  * date：2021/10/14 20:34
  * desc:
  */
-data class Chapter(val title: String, val url: String, val source: String, var content: List<String>? = null): Serializable
+data class Chapter(val title: String, val url: String, val source: String,
+                   var content: List<String>? = null,
+                   // 用于业务自己使用
+                   val customParam: Map<String, Any>? = null): Serializable
 
 suspend fun Chapter.fillChapterContent(forceUpdate: Boolean = false) {
     BookServer.fillChapterContent(this, forceUpdate)

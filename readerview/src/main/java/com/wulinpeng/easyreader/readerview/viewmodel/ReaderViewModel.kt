@@ -9,7 +9,9 @@ import androidx.lifecycle.viewModelScope
 import com.wulinpeng.easyreader.bookserver.model.Book
 import com.wulinpeng.easyreader.bookserver.model.Chapter
 import com.wulinpeng.easyreader.bookserver.model.fillChapterContent
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
+import kotlin.coroutines.CoroutineContext
 
 /**
  * author：wulinpeng
@@ -17,11 +19,16 @@ import kotlinx.coroutines.launch
  * desc:
  */
 class ReaderViewModel: ViewModel() {
+
+    private val errorHandler = ErrorHandler()
+
     lateinit var book: Book
     var startChapter: Int = 0
     var currentChapter by mutableStateOf<Chapter?>(null)
+    var errorMsg by mutableStateOf<String?>(null)
 
     private fun loadChapter(index: Int) {
+        errorMsg = null
         val chapter = book.chapterList!![index]!!
         if (chapter.content != null) {
             currentChapter = chapter
@@ -29,7 +36,7 @@ class ReaderViewModel: ViewModel() {
         } else {
             currentChapter = null
         }
-        viewModelScope.launch {
+        viewModelScope.launch(errorHandler) {
             chapter.fillChapterContent()
             currentChapter = chapter
         }
@@ -55,4 +62,10 @@ class ReaderViewModel: ViewModel() {
         loadCurrentChapter()
     }
 
+    private inner class ErrorHandler(override val key: CoroutineContext.Key<*> = CoroutineExceptionHandler) : CoroutineExceptionHandler {
+        override fun handleException(context: CoroutineContext, exception: Throwable) {
+            errorMsg = exception.message
+        }
+
+    }
 }

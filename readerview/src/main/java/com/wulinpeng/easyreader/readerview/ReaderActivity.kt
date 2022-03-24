@@ -8,7 +8,6 @@ import androidx.activity.compose.setContent
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.wulinpeng.easyreader.bookserver.model.Book
-import com.wulinpeng.easyreader.bookserver.model.fillChapterContent
 import com.wulinpeng.easyreader.readerview.manager.ChapterRenderManager
 import com.wulinpeng.easyreader.readerview.ui.ReaderRootView
 import com.wulinpeng.easyreader.readerview.viewmodel.ReaderViewModel
