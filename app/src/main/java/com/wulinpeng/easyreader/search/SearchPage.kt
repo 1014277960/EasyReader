@@ -47,7 +47,7 @@ fun SearchPage(vm: SearchPageViewModel) {
                         vm.openBook(book)
                     })
                 }
-                if (vm.hasMore) {
+                if (vm.books.isNotEmpty() && vm.hasMore) {
                     item {
                         LaunchedEffect(Unit) {
                             vm.loadMore()
