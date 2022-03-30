@@ -24,12 +24,19 @@ import kotlin.coroutines.CoroutineContext
  */
 class SearchPageViewModel: ViewModel() {
 
+    private val count = 20
+    private var currentPage = 0
+    private var currentSearchKey: String? = null
+
     private var searchJob: Job? = null
 
     val books = mutableStateListOf<Book>()
 
     var _isSearching = mutableStateOf(false)
     val isSearching by _isSearching
+
+    var _hasMore = mutableStateOf(true)
+    val hasMore by _hasMore
 
     var _errMsg = mutableStateOf<String?>(null)
     val errMsg by _errMsg
@@ -47,10 +54,26 @@ class SearchPageViewModel: ViewModel() {
         _isSearching.value = true
         _errMsg.value = null
         searchJob?.cancel()
+        currentPage = 0
+        currentSearchKey = content
         searchJob = viewModelScope.launch(ErrorHandler()) {
             books.clear()
-            // TODO:
-            books.addAll(BookServer.searchBook(content, 0, 100).first)
+            val (bookList, hasMore) = BookServer.searchBook(content, currentPage, count)
+            books.addAll(bookList)
+            _hasMore.value = hasMore
+            _isSearching.value = false
+        }
+    }
+
+    fun loadMore() {
+        if (currentSearchKey == null) {
+            return
+        }
+        currentPage++
+        searchJob = viewModelScope.launch(ErrorHandler()) {
+            val (bookList, hasMore) = BookServer.searchBook(currentSearchKey!!, currentPage, count)
+            books.addAll(bookList)
+            _hasMore.value = hasMore
             _isSearching.value = false
         }
     }

@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberImagePainter
 import com.wulinpeng.easyreader.bookserver.model.Book
+import com.wulinpeng.easyreader.detail.Loading
 import com.wulinpeng.easyreader.homepage.viewmodel.HomePageViewModel
 import com.wulinpeng.easyreader.search.viewmodel.SearchPageViewModel
 import kotlinx.coroutines.launch
@@ -45,6 +46,16 @@ fun SearchPage(vm: SearchPageViewModel) {
                     BookView(book, Modifier.clickable {
                         vm.openBook(book)
                     })
+                }
+                if (vm.hasMore) {
+                    item {
+                        LaunchedEffect(Unit) {
+                            vm.loadMore()
+                        }
+                        Text(text = "正在加载更多", modifier = Modifier
+                            .fillMaxWidth()
+                            .fillMaxHeight(), textAlign = TextAlign.Center, fontSize = 20.sp)
+                    }
                 }
             }
         }

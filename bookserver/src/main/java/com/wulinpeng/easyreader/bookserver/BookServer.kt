@@ -22,7 +22,7 @@ object BookServer {
     }
 
     suspend fun searchBook(bookName: String, page: Int, count: Int): Pair<List<Book>, Boolean> {
-        return BookSourceManager.currentSource().searchBook(bookName, count, page)
+        return BookSourceManager.currentSource().searchBook(bookName, page, count)
     }
 
     /**
