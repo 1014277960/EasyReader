@@ -5,9 +5,15 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.wulinpeng.easyreader.bookserver.BookServer
 import com.wulinpeng.easyreader.bookserver.model.Book
+import com.wulinpeng.easyreader.bookserver.model.Category
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.launch
 
 /**
  * author：wulinpeng
@@ -16,11 +22,12 @@ import kotlinx.coroutines.flow.SharedFlow
  */
 class HomePageViewModel: ViewModel() {
 
-    val books = mutableStateListOf<Book>()
+    private val _searchClickFlow = MutableSharedFlow<Unit>(extraBufferCapacity = Int.MAX_VALUE)
+    val searchClickFlow = _searchClickFlow.asSharedFlow()
 
-    var isSearching by mutableStateOf(false)
-
-    var errMsg by mutableStateOf<String?>(null)
-
-    val bookClickFlow = MutableSharedFlow<Book>(extraBufferCapacity = Int.MAX_VALUE)
+    fun openSearch() {
+        viewModelScope.launch {
+            _searchClickFlow.emit(Unit)
+        }
+    }
 }

@@ -1,6 +1,8 @@
 package com.wulinpeng.easyreader.bookserver.source
 
+import androidx.annotation.Keep
 import com.wulinpeng.easyreader.bookserver.model.Book
+import com.wulinpeng.easyreader.bookserver.model.Category
 import com.wulinpeng.easyreader.bookserver.model.Chapter
 import com.wulinpeng.easyreader.bookserver.model.Update
 import com.wulinpeng.easyreader.network.Network
@@ -20,6 +22,12 @@ import retrofit2.http.Url
  * date：2021/7/18 22:11
  * desc:
  */
+
+@Keep
+private data class CategoryPram(val sortId: Int)
+@Keep
+private data class BiqugeBook(val url_list: String, val url_img: String, val articlename: String, val author: String, val intro: String)
+
 class BiqugeSource: BookSource {
 
     private val BASE_URL = "https://www.biquge7.com"
@@ -29,15 +37,11 @@ class BiqugeSource: BookSource {
         return "笔趣阁"
     }
 
-    override suspend fun searchBook(bookName: String): Deferred<List<Book>> {
-        return async {
-            try {
-                val response = api.searchBook(bookName)
-                parseBook(response)
-            } catch (t: Throwable) {
-                t.printStackTrace()
-                emptyList()
-            }
+    // TODO: page count
+    override suspend fun searchBook(bookName: String, page: Int, count: Int): Pair<List<Book>, Boolean> {
+        return withContext(Dispatchers.IO) {
+            val response = api.searchBook(bookName)
+            parseBook(response) to false
         }
     }
 
@@ -56,7 +60,7 @@ class BiqugeSource: BookSource {
         }
     }
 
-    override suspend fun getBookDetail(book: Book): Book? {
+    override suspend fun getBookDetail(book: Book): Book {
         return withContext(Dispatchers.Default) {
             val response = api.urlContent(book.url)
             parseBookDetail(book, response)
@@ -104,6 +108,47 @@ class BiqugeSource: BookSource {
         }
     }
 
+    override suspend fun getCategorys(): List<Category> {
+        return withContext(Dispatchers.IO) {
+            val response = api.urlContent(BASE_URL)
+            parseCategory(response)
+        }
+    }
+
+    private fun parseCategory(content: String): List<Category> {
+        val element = Jsoup.parse(content)
+        val list = element.getElementsByClass("nav").first().getElementsByTag("a")
+        val size = list.size
+        return list.subList(1, size - 1).mapIndexed { index, element ->
+            Category(element.text(), sourceName(), customParam = CategoryPram(index + 1))
+        }
+    }
+
+    override suspend fun getCategoryBook(
+        category: Category,
+        count: Int,
+        page: Int
+    ): Pair<List<Book>, Boolean> {
+        return withContext(Dispatchers.IO) {
+            val list = api.getCategoryBooks((category.customParam as CategoryPram).sortId, page).map {
+                Book(it.articlename, it.author, it.url_img, "$BASE_URL${it.url_list}", sourceName())
+            }
+            list to !list.isEmpty()
+        }
+    }
+
+    override suspend fun getRankInfos(): List<Category> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getRankInfoBook(
+        category: Category,
+        count: Int,
+        page: Int
+    ): Pair<List<Book>, Boolean> {
+        TODO("Not yet implemented")
+    }
+
     private fun parseChapterContent(response: String): List<String> {
 
         val element = Jsoup.parse(response).getElementById("chaptercontent")
@@ -128,6 +173,9 @@ class BiqugeSource: BookSource {
     private interface Api {
         @GET("/s")
         suspend fun searchBook(@Query("q")bookName: String): String
+
+        @GET("/json")
+        suspend fun getCategoryBooks(@Query("sortid")id: Int, @Query("page")page: Int): List<BiqugeBook>
 
         @GET
         suspend fun urlContent(@Url url: String): String

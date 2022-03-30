@@ -19,7 +19,7 @@ data class Book(val name: String,
                 val category: String = "",
                 val chapterList: List<Chapter>? = null,
                 // 用于业务自己使用
-                val customParam: Map<String, Any>? = null): Serializable
+                val customParam: Any? = null): Serializable
 
 data class Update(val time: String, val title: String): Serializable
 
