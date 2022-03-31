@@ -4,6 +4,7 @@ import android.app.Application
 import com.wulinpeng.easyreader.bookserver.model.Book
 import com.wulinpeng.easyreader.bookserver.model.Category
 import com.wulinpeng.easyreader.bookserver.model.Chapter
+import com.wulinpeng.easyreader.bookserver.model.hasLoadContent
 import com.wulinpeng.easyreader.bookserver.source.BiqugeSource
 import com.wulinpeng.easyreader.bookserver.source.BookSource
 import com.wulinpeng.easyreader.bookserver.source.BookSourceManager
@@ -36,7 +37,7 @@ object BookServer {
      * 查询章节内容Content填充到Chapter中
      */
     suspend fun fillChapterContent(chapter: Chapter, forceUpdate: Boolean = false) {
-        if (!forceUpdate && chapter.content?.isNotEmpty() == true) {
+        if (!forceUpdate && chapter.hasLoadContent()) {
             return
         }
         BookSourceManager.findSource(chapter.source)?.fillChapterContent(chapter)
